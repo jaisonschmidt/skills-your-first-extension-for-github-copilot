@@ -35,34 +35,34 @@ app.post("/copilot", express.json(), async (req, res) => {
   const messages = payload.messages;
 
   // Adiciona a descrição do trabalho do agente às mensagens do copilot
-  // const jobDescription = await fs.readFile(
-  //   path.join(__dirname, "agent-knowledge", "job-description.md"),
-  //   "utf8"
-  // );
-  // messages.unshift({
-  //   role: "system",
-  //   content: jobDescription,
-  // });
+  const jobDescription = await fs.readFile(
+     path.join(__dirname, "agent-knowledge", "job-description.md"),
+     "utf8"
+  );
+  messages.unshift({
+     role: "system",
+     content: jobDescription,
+  });
 
   // Adiciona a visão geral da escola às mensagens do copilot
-  // const schoolOverview = await fs.readFile(
-  //   path.join(__dirname, "agent-knowledge", "school-overview.md"),
-  //   "utf8"
-  // );
-  // messages.unshift({
-  //   role: "system",
-  //   content: schoolOverview,
-  // });
+  const schoolOverview = await fs.readFile(
+     path.join(__dirname, "agent-knowledge", "school-overview.md"),
+     "utf8"
+   );
+   messages.unshift({
+     role: "system",
+     content: schoolOverview,
+   });
 
   // Adiciona as descrições da equipe às mensagens do copilot
-  // const staffDescriptions = await fs.readFile(
-  //   path.join(__dirname, "agent-knowledge", "staff-roles.md"),
-  //   "utf8"
-  // );
-  // messages.unshift({
-  //   role: "system",
-  //   content: staffDescriptions,
-  // });
+   const staffDescriptions = await fs.readFile(
+     path.join(__dirname, "agent-knowledge", "staff-roles.md"),
+     "utf8"
+   );
+   messages.unshift({
+     role: "system",
+     content: staffDescriptions,
+   });
 
   // Envia o array de mensagens para o copilot e coleta a resposta
   const userToken = req.get("X-GitHub-Token");
