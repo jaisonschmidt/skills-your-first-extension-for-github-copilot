@@ -1,0 +1,163 @@
+name: Step 4
+
+on:
+  push:
+    branches:
+      - my-ghc-extension
+    paths:
+      - "ghc-extension-js/agent-knowledge/**"
+
+permissions:
+  contents: read
+  actions: write
+  issues: write
+
+env:
+  STEP_5_FILE: ".github/steps/5-step.md"
+
+jobs:
+  find_exercise:
+    name: Encontrar Issue do Exercício
+    uses: dev-pods/exercise-toolkit/.github/workflows/find-exercise-issue.yml@v0.1.1
+
+  check_step_work:
+    name: Verificar trabalho do passo
+    runs-on: ubuntu-latest
+    needs: [find_exercise]
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - name: Fazer checkout do código
+        uses: actions/checkout@v4
+
+      - name: Obter templates de resposta
+        uses: actions/checkout@v4
+        with:
+          repository: skills/exercise-toolkit
+          path: exercise-toolkit
+          ref: v0.7.0
+
+      - name: Encontrar último comentário
+        id: find-last-comment
+        uses: peter-evans/find-comment@v3
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          direction: last
+
+      - name: Atualizar comentário - verificando trabalho
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          comment-id: ${{ steps.find-last-comment.outputs.comment-id }}
+          file: exercise-toolkit/markdown-templates/step-feedback/checking-work.md
+          edit-mode: replace
+
+      # INÍCIO: Verificar exercício prático
+
+      - name: Verificar se a descrição do agente não usa o template
+        id: check-agent-job-description
+        continue-on-error: true
+        run: |            
+          job_description=$(<"./ghc-extension-js/agent-knowledge/job-description.md")
+          if [[ $job_description =~ "customize the job description" ]]; then
+            echo "A descrição do agente ainda usa o template. Por favor, personalize-a."
+            exit 1
+          fi
+
+      - name: Verificar se o resumo da escola não usa o template
+        continue-on-error: true
+        id: check-school-overview
+        run: |
+          school_overview=$(<"./ghc-extension-js/agent-knowledge/school-overview.md")
+          if [[ $school_overview =~ "customize the school overview" ]]; then
+            echo "O resumo da escola ainda usa o template. Por favor, personalize-o."
+            exit 1
+          fi
+
+      - name: Verificar se os papéis da equipe não usam o template
+        continue-on-error: true
+        id: check-staff-roles
+        run: |
+          staff_roles=$(<"./ghc-extension-js/agent-knowledge/staff-roles.md")
+          if [[ $staff_roles =~ "some roles a high school might have" ]]; then
+            echo "Os papéis da equipe ainda usam o template. Por favor, personalize-os."
+            exit 1
+          fi
+
+      # FIM: Verificar exercício prático
+
+      - name: Atualizar comentário - resultados do passo
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          comment-id: ${{ steps.find-last-comment.outputs.comment-id }}
+          file: exercise-toolkit/markdown-templates/step-feedback/step-results-table.md
+          edit-mode: replace
+          vars: |
+            step_number: 4
+            results_table:
+              - description: "Descrição do agente atualizada"
+                passed: ${{ steps.check-agent-job-description.outcome == 'success' }}
+              - description: "Resumo da escola atualizado"
+                passed: ${{ steps.check-school-overview.outcome == 'success' }}
+              - description: "Papéis da equipe atualizados"
+                passed: ${{ steps.check-staff-roles.outcome == 'success' }}
+
+      - name: Falhar job se nem todas as verificações passaram
+        if: contains(steps.*.outcome, 'failure')
+        run: exit 1
+
+
+  post_next_step_content:
+    name: Publicar conteúdo do próximo passo
+    needs: [find_exercise, check_step_work]
+    runs-on: ubuntu-latest
+    env:
+      ISSUE_REPOSITORY: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+
+    steps:
+      - name: Fazer checkout do código
+        uses: actions/checkout@v4
+
+      - name: Obter templates de resposta
+        uses: actions/checkout@v4
+        with:
+          repository: dev-pods/exercise-toolkit
+          path: exercise-toolkit
+          ref: v0.1.1
+
+      - name: Criar comentário - passo finalizado
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit/markdown-templates/step-feedback/step-finished-prepare-next-step.md
+          vars: |
+            next_step_number: 5
+
+      - name: Criar comentário - adicionar conteúdo do passo
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: ${{ env.STEP_5_FILE }}
+
+      - name: Criar comentário - aguardando progresso
+        uses: GrantBirki/comment@v2.1.1
+        with:
+          repository: ${{ env.ISSUE_REPOSITORY }}
+          issue-number: ${{ env.ISSUE_NUMBER }}
+          file: exercise-toolkit/markdown-templates/step-feedback/watching-for-progress.md
+
+      - name: Desabilitar workflow atual e habilitar o próximo
+        run: |
+          gh workflow disable "${{github.workflow}}"
+          gh workflow enable "Step 5"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

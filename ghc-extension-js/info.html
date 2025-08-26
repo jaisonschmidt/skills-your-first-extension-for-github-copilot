@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GitHub Copilot para a Escola Mergington</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f7f7f7;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
+      header {
+        background-color: #4caf50;
+        color: #fff;
+        padding: 20px;
+        text-align: center;
+      }
+      .container {
+        padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        font-size: 2em;
+        margin: 0;
+      }
+      p {
+        line-height: 1.5;
+      }
+      .prompts-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .prompt {
+        background-color: #e0f7fa;
+        border: 1px solid #4caf50;
+        border-radius: 5px;
+        padding: 10px 5px;
+        position: relative;
+        padding-left: 40px;
+      }
+      .prompt::before {
+        content: "💬";
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>GitHub Copilot para a Escola Mergington</h1>
+    </header>
+    <div class="container">
+      <img
+        src="https://octodex.github.com/images/Professortocat_v2.png"
+        alt="Octodex Professor Octocat"
+        style="display: block; margin: 20px auto; max-width: 200px"
+      />
+      <section>
+        <h2>Resumo</h2>
+        <p>
+          Esta extensão do Copilot foi criada para apoiar a equipe da
+          <b>Escola Mergington</b>, fornecendo serviços de automação e ferramentas para ajudar os funcionários
+          a trabalharem mais rápido, encontrando mais tempo para apoiar nossos alunos. Inclui uma visão geral da
+          escola e diretrizes para desenvolver soluções de software simples adaptadas às nossas necessidades.
+        </p>
+        <p>
+          A extensão foi projetada para ajudar uma ampla variedade de funções, incluindo diretores,
+          professores, orientadores e equipe administrativa. Se você não souber como usar,
+          basta perguntar. Ela já tem algumas ideias para apoiar cada função e ajudar você a começar.
+        </p>
+      </section>
+
+      <section>
+        <h2>Como usar?</h2>
+        <p>Aqui estão alguns exemplos de perguntas (prompts) para te ajudar a começar:</p>
+        <div class="prompts-container">
+          <div class="prompt">
+            Sou diretor e gasto muito tempo preparando resumos para as reuniões do conselho. Você pode me ajudar com isso?
+          </div>
+          <div class="prompt">
+            Não sei como usar essa ferramenta de IA. Você realmente pode me ajudar? O que pode fazer para facilitar meu trabalho?
+          </div>
+          <div class="prompt">Quais funções você pode apoiar? Sou professor(a) de inglês.</div>
+          <div class="prompt">
+            Por favor, crie um programa que mostre um resumo das notas dos meus alunos ao longo dos anos.
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
